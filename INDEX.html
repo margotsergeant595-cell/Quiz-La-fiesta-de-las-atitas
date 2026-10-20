@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz – Fiesta de las Ñatitas</title>
+<style>
+  body{font-family:Arial,sans-serif;background:#f3ece4;margin:0;padding:20px;color:#2b2b2b}
+  .container{max-width:700px;margin:auto}
+  h1{text-align:center;color:#6b2d5c}
+  .q{background:#fff;border-radius:12px;padding:18px;margin:16px 0;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+  .q h3{margin-top:0}
+  .opt{display:block;width:100%;text-align:left;padding:12px;margin:8px 0;border:2px solid #ddd;
+       border-radius:8px;background:#fafafa;font-size:16px;cursor:pointer;transition:.2s}
+  .opt:hover:not(:disabled){border-color:#6b2d5c;background:#f4e8f1}
+  .opt.correct{background:#c8f0c8;border-color:#2e9c2e}
+  .opt.wrong{background:#f6c6c6;border-color:#c93a3a}
+  .opt:disabled{cursor:default}
+  .actions{text-align:center;margin:25px 0}
+  .actions button{padding:12px 24px;margin:0 8px;font-size:16px;border:none;border-radius:8px;
+       cursor:pointer;background:#6b2d5c;color:#fff}
+  .actions button:hover{background:#4f1f43}
+  #result{text-align:center;font-size:22px;font-weight:bold;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Quiz: La fiesta de las Ñatitas</h1>
+  <div id="quiz"></div>
+  <div class="actions">
+    <button onclick="corregir()">Corregir el quiz</button>
+    <button onclick="repetir()">Repetir</button>
+  </div>
+  <div id="result"></div>
+</div>
+
+<script>
+const preguntas = [
+  {q:"¿En qué país se celebra la fiesta de las Ñatitas?", o:["Perú","Bolivia","México"], c:1},
+  {q:"¿En qué ciudad es especialmente importante esta celebración?", o:["La Paz","Lima","Bogotá"], c:0},
+  {q:"¿Qué son las ñatitas?", o:["Estatuas religiosas","Máscaras tradicionales","Cráneos humanos"], c:2},
+  {q:"¿Cuándo se celebra tradicionalmente?", o:["El 8 de noviembre","El 24 de diciembre","El 1 de mayo"], c:0},
+  {q:"¿Qué creencia está relacionada con la cosmovisión andina?", o:["Los antepasados pueden proteger a los vivos","Los muertos no tienen ninguna relación con los vivos","La fiesta celebra la llegada de la primavera"], c:0},
+  {q:"¿Qué significa el sincretismo religioso?", o:["La desaparición de todas las religiones","La combinación de elementos de distintas tradiciones religiosas","La celebración de una fiesta nacional"], c:1}
+];
+let respuestas = [];
+const quiz = document.getElementById("quiz");
+const result = document.getElementById("result");
+
+function render(){
+  quiz.innerHTML = "";
+  respuestas = new Array(preguntas.length).fill(null);
+  result.textContent = "";
+  preguntas.forEach((p,i)=>{
+    const div = document.createElement("div");
+    div.className = "q";
+    div.innerHTML = `<h3>${i+1}. ${p.q}</h3>`;
+    p.o.forEach((txt,j)=>{
+      const b = document.createElement("button");
+      b.className = "opt";
+      b.textContent = txt;
+      b.onclick = ()=>responder(i,j,div);
+      div.appendChild(b);
+    });
+    quiz.appendChild(div);
+  });
+}
+
+function responder(i,j,div){
+  respuestas[i] = j;
+  const btns = div.querySelectorAll(".opt");
+  btns.forEach((b,k)=>{
+    b.disabled = true;
+    if(k===preguntas[i].c) b.classList.add("correct");
+    else if(k===j) b.classList.add("wrong");
+  });
+}
+
+function corregir(){
+  // Révèle les bonnes réponses pour les questions non répondues
+  let score = 0;
+  document.querySelectorAll(".q").forEach((div,i)=>{
+    const btns = div.querySelectorAll(".opt");
+    btns.forEach((b,k)=>{
+      b.disabled = true;
+      if(k===preguntas[i].c) b.classList.add("correct");
+      else if(k===respuestas[i]) b.classList.add("wrong");
+    });
+    if(respuestas[i]===preguntas[i].c) score++;
+  });
+  result.textContent = `Resultado: ${score} / ${preguntas.length}`;
+}
+
+function repetir(){
+  render();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+render();
+</script>
+</body>
+</html>
